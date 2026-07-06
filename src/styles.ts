@@ -3,11 +3,15 @@ import { css } from "lit";
 export const cardStyles = css`
   :host {
     display: block;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   ha-card {
     display: block;
     overflow: hidden;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   .card {
