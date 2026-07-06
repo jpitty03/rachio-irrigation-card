@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import { readFileSync, existsSync, writeFileSync, unlinkSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
 import { tmpdir } from "os";
 
 function loadEnv() {
@@ -51,8 +51,8 @@ const host = env.HA_HOST;
 const port = env.HA_PORT || "22";
 const user = env.HA_USER;
 const pass = env.HA_PASS;
-const remotePath = env.HA_REMOTE_PATH || "/homeassistant/www/community/rachio-irrigation-card/rachio-irrigation-card.js";
-const localFile = "dist/rachio-irrigation-card.js";
+const remotePath = env.HA_REMOTE_PATH || "/root/homeassistant/www/community/rachio-irrigation-card/rachio-irrigation-card.js";
+const localFile = resolve("dist/rachio-irrigation-card.js");
 
 console.log(`\n========================================`);
 console.log(`  Local deploy to ${user}@${host}:${port}`);
@@ -62,6 +62,11 @@ console.log(`========================================`);
 console.log("\n=== Build ===");
 execSync("npm run build", { stdio: "inherit" });
 
+if (!existsSync(localFile)) {
+  console.error(`ERROR: Build output not found: ${localFile}`);
+  process.exit(1);
+}
+
 // ── Create temp WinSCP script ──
 const winscp = findWinSCP();
 const scriptPath = join(tmpdir(), `winscp-deploy-${Date.now()}.txt`);
@@ -69,7 +74,7 @@ const scriptContent = [
   `option batch abort`,
   `option confirm off`,
   `open scp://${user}@${host}:${port}/ -hostkey=* -password=${pass}`,
-  `put ${localFile} "${remotePath}"`,
+  `put "${localFile}" "${remotePath}"`,
   `exit`,
 ].join("\n");
 
