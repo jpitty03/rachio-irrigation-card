@@ -93,8 +93,15 @@ class RachioIrrigationCard extends LitElement {
 
       const nextTimers: Record<string, number> = {};
       for (const [entityId, seconds] of Object.entries(this.timers)) {
-        if (seconds > 0) {
+        if (seconds > 1) {
           nextTimers[entityId] = seconds - 1;
+        } else {
+          // Timer expired — turn off entity and clean up
+          clearTimer(entityId);
+          if (this.hass) {
+            const domain = getDomain(entityId);
+            this.hass.callService(domain, "turn_off", { entity_id: entityId });
+          }
         }
       }
       this.timers = nextTimers;
@@ -329,7 +336,8 @@ class RachioIrrigationCard extends LitElement {
   private renderZone(zone: IrrigationZoneConfig, index: number) {
     const entity = this.getEntityState(zone.entity);
     const missing = !entity;
-    const active = isEntityOn(entity?.state);
+    const remaining = this.timers[zone.entity];
+    const active = !!remaining && remaining > 0;
     const name = this.getZoneLabel(zone, index);
     const location = zone.location || "";
     const icon = zone.icon || "mdi:sprinkler";
@@ -344,7 +352,7 @@ class RachioIrrigationCard extends LitElement {
         <span class="zone-name">${name}</span>
         ${location ? html`<span class="zone-location">${location}</span>` : nothing}
         ${this.showStatus
-          ? html`<span class="zone-status">${missing ? "Missing" : active ? "Running" : "Off"}</span>`
+          ? html`<span class="zone-status">${missing ? "Missing" : active ? "On" : "Off"}</span>`
           : nothing}
       </button>
     `;

@@ -155,13 +155,13 @@ export const cardStyles = css`
   }
 
   .zone-button.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--text-primary-color, white);
+    border-color: var(--state-active-color, #4caf50);
+    border-width: 2px;
+    box-shadow: 0 0 12px 2px rgba(76, 175, 80, 0.4);
   }
 
   .zone-button.active .zone-icon {
-    color: var(--text-primary-color, white);
+    color: var(--state-active-color, #4caf50);
   }
 
   .zone-icon {
