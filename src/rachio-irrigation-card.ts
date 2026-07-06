@@ -344,7 +344,27 @@ class RachioIrrigationCard extends LitElement {
 customElements.define("rachio-irrigation-card", RachioIrrigationCard);
 
 declare global {
+  interface Window {
+    customCards?: Array<{
+      type: string;
+      name: string;
+      description: string;
+      preview?: boolean;
+      documentationURL?: string;
+    }>;
+  }
   interface HTMLElementTagNameMap {
     "rachio-irrigation-card": RachioIrrigationCard;
   }
 }
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "rachio-irrigation-card",
+  name: "Rachio Irrigation Card",
+  description:
+    "A compact irrigation dashboard card for Rachio-style zone control.",
+  preview: true,
+  documentationURL:
+    "https://github.com/jpitty03/rachio-irrigation-card/blob/main/README.md",
+});

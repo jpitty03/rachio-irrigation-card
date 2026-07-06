@@ -92,6 +92,10 @@ optional rain delay and standby entities, and layout options
 (columns, compact, show status, show timer). Changes are saved live to
 the dashboard.
 
+The card also registers itself with the Home Assistant card picker, so
+you can add it directly from the dashboard editor (Edit dashboard →
+Add Card → search "Rachio Irrigation Card") instead of pasting YAML.
+
 ### Options
 
 | Field                | Type    | Required | Default                | Description                                          |
