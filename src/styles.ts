@@ -1,6 +1,15 @@
 import { css } from "lit";
 
 export const cardStyles = css`
+  :host {
+    display: block;
+  }
+
+  ha-card {
+    display: block;
+    overflow: hidden;
+  }
+
   .card {
     padding: 12px;
   }
