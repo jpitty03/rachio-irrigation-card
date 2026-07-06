@@ -13,13 +13,19 @@ configurable Home Assistant entities such as `switch.*`,
 
 ## Features
 
-- 2-column (or N-column) zone grid with one-tap start/stop
-- Per-zone duration with a countdown timer (persists across browser refresh)
-- Rain Delay and Standby toggle buttons
+- Unified card layout: header, rain status, progress bar, zone grid, action buttons
+- N-column zone grid (default 4) with icon, name, location, and status per zone
+- Green glowing active state on running zones (timer-based, auto-turns-off when expired)
+- Per-zone duration with countdown timer (persists across browser refresh)
+- Progress bar showing elapsed/total runtime for the active zone
+- Rain status row (Wet/Dry) derived from rain delay entity
+- Rain Delay and Standby toggle buttons with live status
 - Stop Watering button to turn off all zones at once
 - Configurable service actions (`tap_action`, `stop_action`) for Rachio-specific services
 - Layout options (columns, compact mode, show status/timer)
 - Visual editor (no YAML required) for all common config fields
+- Card picker registration (add from dashboard editor, no YAML needed)
+- Theme-aware styling using HA CSS variables throughout
 - Graceful handling of missing entities
 - Config validation with clear error messages
 - Designed for Rachio, but not tied to the Rachio integration
@@ -73,10 +79,12 @@ title: Irrigation Quick Run
 default_duration: 10
 show_timer: true
 zones:
-  - name: Front Lawn
+  - name: Zone 1
+    location: Front Lawn
     entity: switch.rachio_front_lawn
     duration: 10
-  - name: Back Yard
+  - name: Zone 2
+    location: Back Yard
     entity: switch.rachio_back_yard
     duration: 15
 rain_delay_entity: switch.rachio_rain_delay
@@ -117,7 +125,8 @@ Add Card → search "Rachio Irrigation Card") instead of pasting YAML.
 | `entity`     | string | yes      | -                                  | Any on/off HA entity.                              |
 | `name`       | string | no       | entity `friendly_name` or `entity` | Display label for the zone button.                 |
 | `duration`   | number | no       | `default_duration` or `10`         | Run duration in minutes.                           |
-| `icon`       | string | no       | -                                  | Optional `mdi:` icon (not yet rendered).           |
+| `location`  | string | no       | -                                  | Secondary label (e.g. "Front Yard").               |
+| `icon`       | string | no       | -                                  | Optional `mdi:` icon for the zone button.        |
 | `tap_action` | action | no       | -                                  | Override the toggle service call for this zone.    |
 
 ### Action format
@@ -139,7 +148,7 @@ omitted, Stop Watering loops `turn_off` over all zones.
 
 ```yaml
 layout:
-  columns: 2
+  columns: 4
   compact: true
   show_status: true
   show_timer: true
@@ -147,7 +156,7 @@ layout:
 
 | Field         | Type    | Default | Description                                               |
 | ------------- | ------- | ------- | --------------------------------------------------------- |
-| `columns`     | number  | `2`     | Zone grid columns (clamped to 1–6).                       |
+| `columns`     | number  | `4`     | Zone grid columns (clamped to 1–6).                       |
 | `compact`     | boolean | `false` | Tighter padding; hides status text.                       |
 | `show_status` | boolean | `true`  | Show "Running"/"Off" text on zone buttons.                |
 | `show_timer`  | boolean | `true`  | Override top-level `show_timer` for timer visibility.     |
@@ -243,15 +252,53 @@ npm run typecheck  # TypeScript checks
 npm test           # unit tests
 ```
 
-Copy `dist/rachio-irrigation-card.js` to `/config/www/` and add the
-resource `/local/rachio-irrigation-card.js` (type: JavaScript Module)
-for local testing.
+### Local deploy to Home Assistant
+
+Build and copy the card directly to your HA instance via WinSCP, no
+GitHub round-trip needed:
+
+```sh
+npm run deploy
+```
+
+This reads connection details from a `.env` file (gitignored). Copy
+`.env.example` to `.env` and fill in your HA SSH credentials:
+
+```sh
+cp .env.example .env
+# Edit .env and set HA_PASS to your HA password
+```
+
+After deploying, hard-refresh your browser (Ctrl+Shift+R).
+
+### Release a new version
+
+Build, test, commit, push, tag, and create a GitHub release in one
+command. The release workflow automatically builds and attaches the
+JS asset to the release.
+
+```sh
+npm run release              # patch bump (0.4.1 -> 0.4.2)
+npm run release minor        # minor bump (0.4.1 -> 0.5.0)
+npm run release major        # major bump (0.4.1 -> 1.0.0)
+```
+
+Release notes are auto-generated from commit messages since the last
+tag. Edit them afterwards on the GitHub release page if needed.
+
+### Manual testing without scripts
+
+Copy `dist/rachio-irrigation-card.js` to your HA `/config/www/`
+directory (via SCP, Samba share, or the File editor add-on), then add
+the resource `/local/rachio-irrigation-card.js` (type: JavaScript
+Module) in Settings -> Dashboards -> Resources.
 
 ## Roadmap
 
 - v0.1.0 — basic card, generic entity support, local timer, HACS install
 - v0.2.0 — configurable service actions, localStorage timer, layout options, validation
-- v0.3.0 — visual card editor, entity pickers
+- v0.3.0 — visual card editor, entity pickers, card picker registration
+- v0.4.0 — unified card redesign: header, rain status, progress bar, zone locations, green glowing active zones
 - v1.0.0 — stable config schema, full Rachio examples, test coverage
 
 ## License
