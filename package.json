@@ -8,7 +8,9 @@
     "dev": "vite build --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "release": "node scripts/release.mjs",
+    "deploy": "node scripts/deploy-local.mjs"
   },
   "dependencies": {
     "lit": "^3.0.0"

@@ -4,6 +4,9 @@ node_modules/
 # Build output (shipped via GitHub releases, not committed)
 dist/
 
+# Secrets — never commit
+.env
+
 # Editor / OS
 .vscode/
 .idea/
