@@ -1,0 +1,15 @@
+# Snippet for local development/testing of rachio-irrigation-card.
+# Add to your Home Assistant configuration.yaml under input_boolean:
+input_boolean:
+  rachio_zone_1:
+    name: Rachio Zone 1
+  rachio_zone_2:
+    name: Rachio Zone 2
+  rachio_zone_3:
+    name: Rachio Zone 3
+  rachio_zone_4:
+    name: Rachio Zone 4
+  rachio_rain_delay:
+    name: Rachio Rain Delay
+  rachio_standby:
+    name: Rachio Standby

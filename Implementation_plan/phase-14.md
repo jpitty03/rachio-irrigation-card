@@ -1,26 +1,48 @@
 Phase 14: Install through HACS as a custom repository
 Goal
 
-Validate the exact user install path.
+Validate the exact user install path end-to-end.
 
-In Home Assistant:
+Prerequisites (must be done before this phase):
 
-HACS → three-dot menu → Custom repositories
+- Repo is public on GitHub.
+- `hacs.json` exists in repo root (Phase 11).
+- `README.md` and `LICENSE` exist (Phase 12).
+- At least one GitHub release exists with
+  `rachio-irrigation-card.js` attached (Phase 13), OR `dist/`
+  contains the file on the default branch (not recommended).
 
-Add your GitHub repo URL.
+Install steps in Home Assistant
 
-Select type:
+1. Open HACS.
+2. Click the three-dot menu (top right) → **Custom repositories**.
+3. Paste your GitHub repo URL.
+4. Select type: **Dashboard**.
+5. Click **Add**.
+6. Find "Rachio Irrigation Card" in the HACS dashboard list and click
+   **Install**.
+7. If prompted, allow HACS to add the Lovelace resource. Otherwise add
+   it manually:
+   - Settings → Dashboards → Resources → Add Resource
+   - URL: `/hacsfiles/rachio-irrigation-card/rachio-irrigation-card.js`
+   - Type: `JavaScript Module`
+8. Refresh the dashboard.
 
-Dashboard
+Resource URL
 
-Then install it. HACS documentation describes custom repositories as adding the repository URL, selecting the correct type, and clicking add.
+After HACS install, the resource should point to:
 
-After installation, the resource should point roughly to:
-
+```
 /hacsfiles/rachio-irrigation-card/rachio-irrigation-card.js
+```
 
-Then test the card with:
+HACS serves plugin files under `/hacsfiles/<repo-name>/`. The
+filename matches the repo name (per Phase 11), so no path overrides
+are needed.
 
+Test config
+
+```yaml
 type: custom:rachio-irrigation-card
 title: Irrigation Quick Run
 zones:
@@ -30,3 +52,15 @@ zones:
   - name: Zone 2
     entity: input_boolean.rachio_zone_2
     duration: 10
+```
+
+Validation checklist
+
+- [ ] HACS lists the repo under type "Dashboard"
+- [ ] Install completes without errors
+- [ ] Resource `/hacsfiles/rachio-irrigation-card/rachio-irrigation-card.js`
+      is present in Settings → Dashboards → Resources
+- [ ] Card renders in a dashboard without "Custom element doesn't exist"
+- [ ] Toggling zones works through the HACS-installed resource (not
+      just the `/local/` copy from Phase 5)
+- [ ] Updating the card via HACS pulls the latest release file
