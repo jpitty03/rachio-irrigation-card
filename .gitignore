@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output (shipped via GitHub releases, not committed)
+dist/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

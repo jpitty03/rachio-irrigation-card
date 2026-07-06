@@ -1,0 +1,6 @@
+{
+  "name": "Rachio Irrigation Card",
+  "filename": "rachio-irrigation-card.js",
+  "content_in_root": false,
+  "homeassistant": "2024.8.0"
+}
