@@ -1,6 +1,6 @@
 {
   "name": "rachio-irrigation-card",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "A compact irrigation dashboard card for Home Assistant, designed for Rachio-style zone control.",
   "type": "module",
   "scripts": {
@@ -14,6 +14,7 @@
     "lit": "^3.0.0"
   },
   "devDependencies": {
+    "custom-card-helpers": "^1.9.0",
     "typescript": "^5.0.0",
     "vite": "^8.0.0",
     "vitest": "^4.1.0"

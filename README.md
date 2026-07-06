@@ -17,6 +17,7 @@ configurable Home Assistant entities such as `switch.*`,
 - Stop Watering button to turn off all zones at once
 - Configurable service actions (`tap_action`, `stop_action`) for Rachio-specific services
 - Layout options (columns, compact mode, show status/timer)
+- Visual editor (no YAML required) for all common config fields
 - Graceful handling of missing entities
 - Config validation with clear error messages
 - Designed for Rachio, but not tied to the Rachio integration
@@ -79,6 +80,15 @@ zones:
 rain_delay_entity: switch.rachio_rain_delay
 standby_entity: switch.rachio_standby
 ```
+
+### Visual editor
+
+The card ships with a built-in visual editor (no YAML required). In
+dashboard edit mode, click **Configure** on the card to edit the title,
+default duration, per-zone name/entity/duration, add or remove zones,
+optional rain delay and standby entities, and layout options
+(columns, compact, show status, show timer). Changes are saved live to
+the dashboard.
 
 ### Options
 

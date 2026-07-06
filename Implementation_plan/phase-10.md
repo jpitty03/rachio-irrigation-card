@@ -1,8 +1,31 @@
 Phase 10: Add visual editor support
+Status: COMPLETE (v0.3.0)
 Goal
 
 Make the card usable through the Home Assistant UI editor instead of
-YAML only. Deferred to v0.3.0 per the Phase 18 roadmap.
+YAML only.
+
+Two parts:
+
+1. `getStubConfig()` — provides the default YAML when the card is
+   added from the card picker. Shipped in v0.2.0.
+2. `getConfigElement()` — returns a custom `<rachio-irrigation-card-editor>`
+   Lit element for full visual editing. Shipped in v0.3.0.
+
+Implementation shipped in `src/editor.ts`:
+- `RachioIrrigationCardEditor` (`@customElement("rachio-irrigation-card-editor")`)
+- Implements `setConfig` + `config-changed` CustomEvent contract.
+- Fields: title, default_duration, show_timer, per-zone name/entity/
+  duration, add/remove zones (min 1), rain_delay_entity, standby_entity,
+  layout (columns/compact/show_status/show_timer).
+- Uses HA native elements: `ha-textfield`, `ha-entity-picker`,
+  `ha-switch`, `ha-formfield`, `ha-icon-button`.
+- Wired via `RachioIrrigationCard.getConfigElement()` with dynamic
+  `import("./editor")`, inlined into the main bundle by
+  `codeSplitting: false`.
+- `custom-card-helpers` added as devDependency for `HomeAssistant` type.
+
+Original plan reference below.
 
 Two parts:
 

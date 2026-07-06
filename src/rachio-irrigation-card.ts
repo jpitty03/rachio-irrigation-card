@@ -149,6 +149,11 @@ class RachioIrrigationCard extends LitElement {
     };
   }
 
+  public static async getConfigElement(): Promise<HTMLElement> {
+    await import("./editor");
+    return document.createElement("rachio-irrigation-card-editor");
+  }
+
   private getEntityState(entityId: string) {
     return this.hass?.states?.[entityId];
   }
