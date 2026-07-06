@@ -124,15 +124,14 @@ class RachioIrrigationCard extends LitElement {
   }
 
   getCardSize() {
-    return 3;
+    return 2;
   }
 
   getGridOptions() {
     return {
-      rows: 3,
-      columns: 12,
-      min_rows: 2,
-      min_columns: 4,
+      columns: 6,
+      min_columns: 3,
+      min_rows: 1,
     };
   }
 
