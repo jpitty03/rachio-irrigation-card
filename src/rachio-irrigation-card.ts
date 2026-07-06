@@ -138,12 +138,13 @@ class RachioIrrigationCard extends LitElement {
   static getStubConfig(): Partial<RachioIrrigationCardConfig> {
     return {
       title: "Irrigation Quick Run",
+      default_duration: 10,
+      show_timer: true,
       zones: [
-        {
-          name: "Zone 1",
-          entity: "switch.zone_1",
-          duration: 10,
-        },
+        { name: "Zone 1", location: "Front Yard", entity: "switch.zone_1", duration: 10 },
+        { name: "Zone 2", location: "Front Side", entity: "switch.zone_2", duration: 10 },
+        { name: "Zone 3", location: "Far Backyard", entity: "switch.zone_3", duration: 10 },
+        { name: "Zone 4", location: "Backyard", entity: "switch.zone_4", duration: 10 },
       ],
     };
   }
@@ -221,48 +222,50 @@ class RachioIrrigationCard extends LitElement {
   }
 
   private get columnCount(): number {
-    const cols = this.config.layout?.columns ?? 2;
+    const cols = this.config.layout?.columns ?? 4;
     if (cols < 1 || cols > 6) {
       console.warn(
-        `Rachio Irrigation Card: layout.columns ${cols} out of range [1,6]; falling back to 2.`
+        `Rachio Irrigation Card: layout.columns ${cols} out of range [1,6]; falling back to 4.`
       );
-      return 2;
+      return 4;
     }
     return cols;
   }
 
+  private get actionColumnCount(): number {
+    let count = 1;
+    if (this.config.rain_delay_entity) count++;
+    if (this.config.standby_entity) count++;
+    return count;
+  }
+
   private renderLayoutVars(): string {
     const cols = this.columnCount;
-    const actionCols = cols >= 3 ? cols : 2;
+    const actionCols = this.actionColumnCount;
     return `--zone-columns: ${cols}; --action-columns: ${actionCols};`;
   }
 
-  private renderZone(zone: IrrigationZoneConfig) {
-    const entity = this.getEntityState(zone.entity);
-    const missing = !entity;
-    const active = isEntityOn(entity?.state);
-    const label = zone.name || entity?.attributes?.friendly_name || zone.entity;
-    const remaining = this.timers[zone.entity];
-
-    return html`
-      <button
-        class=${active ? "zone active" : "zone"}
-        ?disabled=${missing}
-        @click=${() => this.toggleZone(zone)}
-      >
-        <span class="zone-name">${label}</span>
-        ${this.showStatus
-          ? html`<span class="zone-status">
-              ${missing ? "Missing entity" : active ? "Running" : "Off"}
-            </span>`
-          : nothing}
-        ${this.showTimer && remaining
-          ? html`<span class="timer">${formatRemaining(remaining)}</span>`
-          : nothing}
-      </button>
-    `;
+  private getActiveZone(): { zone: IrrigationZoneConfig; remaining: number; total: number } | null {
+    if (!this.config) return null;
+    for (const zone of this.config.zones) {
+      const remaining = this.timers[zone.entity];
+      if (remaining && remaining > 0) {
+        const durationMinutes =
+          zone.duration ?? this.config.default_duration ?? 10;
+        const total = durationMinutes * 60;
+        return { zone, remaining, total };
+      }
+    }
+    return null;
   }
 
+  private getZoneLabel(zone: IrrigationZoneConfig, index: number): string {
+    return (
+      zone.name ||
+      this.getEntityState(zone.entity)?.attributes?.friendly_name ||
+      `Zone ${index + 1}`
+    );
+  }
   private renderWarnings(): unknown {
     if (!this.hass) return nothing;
     const missing: string[] = [];
@@ -291,46 +294,137 @@ class RachioIrrigationCard extends LitElement {
     `;
   }
 
+  private renderRainStatus() {
+    const entity = this.getEntityState(this.config.rain_delay_entity!);
+    const status = !entity ? "Unknown" : isEntityOn(entity.state) ? "Wet" : "Dry";
+    return html`
+      <div class="status-row">
+        <div class="status-label">
+          <ha-icon icon="mdi:weather-rainy"></ha-icon>
+          <span>Rain Detected</span>
+        </div>
+        <div class="status-value">${status}</div>
+      </div>
+    `;
+  }
+
+  private renderProgress(active: { zone: IrrigationZoneConfig; remaining: number; total: number }) {
+    const elapsed = active.total - active.remaining;
+    const progress = Math.min(100, Math.max(0, Math.round((elapsed / active.total) * 100)));
+    const zoneIndex = this.config.zones.indexOf(active.zone);
+    const zoneLabel = this.getZoneLabel(active.zone, zoneIndex);
+    return html`
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-zone">${zoneLabel} Running</span>
+          <span class="progress-time">${formatRemaining(elapsed)} / ${formatRemaining(active.total)}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${progress}%"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  private renderZone(zone: IrrigationZoneConfig, index: number) {
+    const entity = this.getEntityState(zone.entity);
+    const missing = !entity;
+    const active = isEntityOn(entity?.state);
+    const name = this.getZoneLabel(zone, index);
+    const location = zone.location || "";
+    const icon = zone.icon || "mdi:sprinkler";
+
+    return html`
+      <button
+        class=${active ? "zone-button active" : "zone-button"}
+        ?disabled=${missing}
+        @click=${() => this.toggleZone(zone)}
+      >
+        <ha-icon icon=${icon} class="zone-icon"></ha-icon>
+        <span class="zone-name">${name}</span>
+        ${location ? html`<span class="zone-location">${location}</span>` : nothing}
+        ${this.showStatus
+          ? html`<span class="zone-status">${missing ? "Missing" : active ? "Running" : "Off"}</span>`
+          : nothing}
+      </button>
+    `;
+  }
+
+  private renderRainDelayButton() {
+    const entity = this.getEntityState(this.config.rain_delay_entity!);
+    const isOn = isEntityOn(entity?.state);
+    return html`
+      <button
+        class="action-button"
+        @click=${() => this.toggleEntity(this.config.rain_delay_entity!)}
+      >
+        <ha-icon icon="mdi:weather-rainy" class="action-icon"></ha-icon>
+        <span class="action-name">Rain Delay</span>
+        <span class="action-status">${!entity ? "Unknown" : isOn ? "Active" : "Off"}</span>
+      </button>
+    `;
+  }
+
+  private renderStandbyButton() {
+    const entity = this.getEntityState(this.config.standby_entity!);
+    const isOn = isEntityOn(entity?.state);
+    return html`
+      <button
+        class="action-button"
+        @click=${() => this.toggleEntity(this.config.standby_entity!)}
+      >
+        <ha-icon icon="mdi:sleep" class="action-icon"></ha-icon>
+        <span class="action-name">Standby</span>
+        <span class="action-status">${!entity ? "Unknown" : isOn ? "Active" : "Off"}</span>
+      </button>
+    `;
+  }
+
+  private renderStopButton() {
+    return html`
+      <button class="action-button stop" @click=${this.stopAll}>
+        <ha-icon icon="mdi:stop" class="action-icon"></ha-icon>
+        <span class="action-name">Stop</span>
+        <span class="action-status">Watering</span>
+      </button>
+    `;
+  }
+
   render() {
     if (!this.config) return nothing;
+    const active = this.getActiveZone();
+    const compact = this.config.layout?.compact;
+
     return html`
       <ha-card>
         <div
-          class=${this.config.layout?.compact ? "card compact" : "card"}
+          class=${compact ? "quick-run-card compact" : "quick-run-card"}
           style=${this.renderLayoutVars()}
         >
-          <div class="header">
+          <div class="quick-run-header">
             <div class="title">${this.config.title}</div>
-            <div class="connection">●</div>
+            <div class="connection-status">
+              <ha-icon icon="mdi:check-circle"></ha-icon>
+              <span>Connected</span>
+            </div>
           </div>
+
+          <div class="divider"></div>
+
+          ${this.config.rain_delay_entity ? this.renderRainStatus() : nothing}
+
+          ${this.showTimer && active ? this.renderProgress(active) : nothing}
+
           ${this.renderWarnings()}
-          <div class="zones">
-            ${this.config.zones.map((zone) => this.renderZone(zone))}
+
+          <div class="zone-grid">
+            ${this.config.zones.map((zone, i) => this.renderZone(zone, i))}
           </div>
-          <div class="actions">
-            ${this.config.rain_delay_entity
-              ? html`
-                  <button
-                    class="action"
-                    @click=${() => this.toggleEntity(this.config.rain_delay_entity!)}
-                  >
-                    Rain Delay
-                  </button>
-                `
-              : nothing}
-            ${this.config.standby_entity
-              ? html`
-                  <button
-                    class="action"
-                    @click=${() => this.toggleEntity(this.config.standby_entity!)}
-                  >
-                    Standby
-                  </button>
-                `
-              : nothing}
-            <button class="action stop" @click=${this.stopAll}>
-              Stop Watering
-            </button>
+
+          <div class="action-grid">
+            ${this.config.rain_delay_entity ? this.renderRainDelayButton() : nothing}
+            ${this.config.standby_entity ? this.renderStandbyButton() : nothing}
+            ${this.renderStopButton()}
           </div>
         </div>
       </ha-card>

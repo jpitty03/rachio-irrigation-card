@@ -122,6 +122,16 @@ export class RachioIrrigationCardEditor extends LitElement {
                   ></ha-textfield>
                 </div>
                 <div class="field">
+                  <ha-textfield
+                    label="Location"
+                    .value=${zone.location ?? ""}
+                    @input=${(e: Event) =>
+                      this._updateZone(i, {
+                        location: (e.target as HTMLInputElement).value,
+                      })}
+                  ></ha-textfield>
+                </div>
+                <div class="field">
                   <ha-entity-picker
                     .hass=${this.hass}
                     label="Entity"

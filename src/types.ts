@@ -6,6 +6,7 @@ export interface ServiceActionConfig {
 
 export interface IrrigationZoneConfig {
   name?: string;
+  location?: string;
   entity: string;
   duration?: number;
   icon?: string;
