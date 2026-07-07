@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execSync, execFileSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 
 function run(cmd, label) {
@@ -9,6 +9,13 @@ function run(cmd, label) {
 
 function runQuiet(cmd) {
   return execSync(cmd, { encoding: "utf8", stdio: "pipe" }).trim();
+}
+
+// Run a command with multi-line stdin (avoids shell-escaping newlines).
+function runWithInput(args, input, label) {
+  console.log(`\n=== ${label} ===`);
+  console.log(`> ${args.join(" ")}`);
+  execFileSync(args[0], args.slice(1), { input, stdio: ["pipe", "inherit", "inherit"] });
 }
 
 function bumpVersion(version, type) {
@@ -31,7 +38,7 @@ function findGh() {
     const full = "C:\\Program Files\\GitHub CLI\\gh.exe";
     try {
       execSync(`"${full}" --version`, { stdio: "pipe", encoding: "utf8" });
-      return `"${full}"`;
+      return full;
     } catch {
       console.error("ERROR: gh CLI not found. Install it or add to PATH.");
       process.exit(1);
@@ -66,7 +73,7 @@ run("npm test", "Tests");
 // ── Stage all changes (including version bump) ──
 run("git add -A", "Stage changes");
 
-// ── Commit if there are staged changes ──
+// ── Check for staged changes ──
 let hasStaged = true;
 try {
   execSync("git diff --cached --quiet", { stdio: "pipe" });
@@ -75,19 +82,21 @@ try {
   hasStaged = true;
 }
 
+// ── Generate changelog from commits since last tag (once, reused) ──
+let changelog = "";
+try {
+  const lastTag = runQuiet("git describe --tags --abbrev=0");
+  changelog = runQuiet(`git log ${lastTag}..HEAD --pretty=format:"- %s"`);
+} catch {
+  // No previous tag — empty changelog
+}
+
+// ── Commit if there are staged changes ──
 if (hasStaged) {
-  // Generate commit message from recent commits since last tag
-  let commitMsg = `release ${tag}`;
-  try {
-    const lastTag = runQuiet("git describe --tags --abbrev=0");
-    const log = runQuiet(`git log ${lastTag}..HEAD --pretty=format:"- %s"`);
-    if (log) {
-      commitMsg = `release ${tag}\n\n${log}`;
-    }
-  } catch {
-    // No previous tag — use simple message
-  }
-  run(`git commit -m "${commitMsg.replace(/\n/g, "\\n")}"`, "Commit");
+  const commitMsg = changelog
+    ? `release ${tag}\n\n${changelog}`
+    : `release ${tag}`;
+  runWithInput(["git", "commit", "-F", "-"], commitMsg, "Commit");
 } else {
   console.log("\nNo staged changes — skipping commit.");
 }
@@ -104,26 +113,16 @@ try {
   // Tag doesn't exist — create it
 }
 
-run(`git tag -a ${tag} -m "${tag}"`, `Create tag ${tag}`);
+runWithInput(["git", "tag", "-a", tag, "-F", "-"], tag, `Create tag ${tag}`);
 run(`git push origin ${tag}`, `Push tag ${tag}`);
 
 // ── Create GitHub release ──
 const gh = findGh();
 
-// Generate release notes from git log since last tag
-let releaseNotes = `Release ${tag}`;
-try {
-  const lastTag = runQuiet("git describe --tags --abbrev=0 HEAD~1");
-  const log = runQuiet(`git log ${lastTag}..HEAD --pretty=format:"- %s"`);
-  if (log) {
-    releaseNotes = `## Changes\n\n${log}`;
-  }
-} catch {
-  // No previous tag
-}
-
-run(
-  `${gh} release create ${tag} --title "${tag}" --notes "${releaseNotes.replace(/\n/g, "\\n")}" --target main`,
+const releaseNotes = changelog ? `## Changes\n\n${changelog}` : `Release ${tag}`;
+runWithInput(
+  [gh, "release", "create", tag, "--title", tag, "--notes-file", "-", "--target", "main"],
+  releaseNotes,
   "Create GitHub release"
 );
 

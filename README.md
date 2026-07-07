@@ -1,5 +1,23 @@
 # Rachio Irrigation Card
 
+[![Stable][releases-shield]][releases] [![Beta][releases-dev-shield]][releases-dev] [![HACS Badge][hacs-badge]][hacs-link] ![Project Maintenance][maintenance-shield] <br/> ![Downloads][downloads] [![GitHub Activity][commits-shield]][commits] [![License][license-shield]](LICENSE) [![Discord][discord-shield]][discord] [![Community Forum][forum-shield]][forum]
+
+[commits-shield]: https://img.shields.io/github/commit-activity/y/jpitty03/rachio-irrigation-card.svg
+[commits]: https://github.com/jpitty03/rachio-irrigation-card/commits/main
+[discord]: https://discord.gg/Qa5fW2R
+[discord-shield]: https://img.shields.io/discord/330944238910963714.svg
+[forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
+[forum]: https://community.home-assistant.io/
+[license-shield]: https://img.shields.io/github/license/jpitty03/rachio-irrigation-card.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
+[releases-shield]: https://img.shields.io/github/release/jpitty03/rachio-irrigation-card.svg
+[releases]: https://github.com/jpitty03/rachio-irrigation-card/releases/latest
+[releases-dev-shield]: https://img.shields.io/github/package-json/v/jpitty03/rachio-irrigation-card/dev?label=release%40dev
+[releases-dev]: https://github.com/jpitty03/rachio-irrigation-card/releases
+[hacs-badge]: https://img.shields.io/badge/HACS-Default-41BDF5.svg
+[downloads]: https://img.shields.io/github/downloads/jpitty03/rachio-irrigation-card/total
+[hacs-link]: https://hacs.xyz/
+
 A compact irrigation dashboard card for Home Assistant, designed for
 Rachio-style zone control. Works with any on/off Home Assistant entity
 (`switch.*`, `input_boolean.*`, and compatible irrigation zone entities).
