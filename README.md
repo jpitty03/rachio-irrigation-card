@@ -1,6 +1,6 @@
 # Rachio Irrigation Card
 
-[![Stable][releases-shield]][releases] [![Beta][releases-dev-shield]][releases-dev] [![HACS Badge][hacs-badge]][hacs-link] ![Project Maintenance][maintenance-shield] <br/> ![Downloads][downloads] [![GitHub Activity][commits-shield]][commits] [![License][license-shield]](LICENSE) [![Discord][discord-shield]][discord] [![Community Forum][forum-shield]][forum]
+[![Stable][releases-shield]][releases] [![HACS Badge][hacs-badge]][hacs-link] ![Project Maintenance][maintenance-shield] ![Downloads][downloads] [![GitHub Activity][commits-shield]][commits] [![License][license-shield]](LICENSE) [![Community Forum][forum-shield]][forum]
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/jpitty03/rachio-irrigation-card.svg
 [commits]: https://github.com/jpitty03/rachio-irrigation-card/commits/main
@@ -22,7 +22,7 @@ A compact irrigation dashboard card for Home Assistant, designed for
 Rachio-style zone control. Works with any on/off Home Assistant entity
 (`switch.*`, `input_boolean.*`, and compatible irrigation zone entities).
 
-![Rachio Irrigation Card preview](images/card-preview.svg)
+![Rachio Irrigation Card preview](images/rachiov1.png)
 
 This card is designed for Rachio-style irrigation dashboards using the
 entities that are available with the Rachio integration, but it
