@@ -1,6 +1,6 @@
 # Rachio Irrigation Card
 
-[![Stable][releases-shield]][releases] [![Beta][releases-dev-shield]][releases-dev] [![HACS Badge][hacs-badge]][hacs-link] ![Project Maintenance][maintenance-shield] <br/> ![Downloads][downloads] [![GitHub Activity][commits-shield]][commits] [![License][license-shield]](LICENSE) [![Discord][discord-shield]][discord] [![Community Forum][forum-shield]][forum]
+[![Stable][releases-shield]][releases] [![HACS Badge][hacs-badge]][hacs-link] ![Project Maintenance][maintenance-shield] ![Downloads][downloads] [![GitHub Activity][commits-shield]][commits] [![License][license-shield]](LICENSE) [![Community Forum][forum-shield]][forum]
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/jpitty03/rachio-irrigation-card.svg
 [commits]: https://github.com/jpitty03/rachio-irrigation-card/commits/main
