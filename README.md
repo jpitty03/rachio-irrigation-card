@@ -22,7 +22,7 @@ A compact irrigation dashboard card for Home Assistant, designed for
 Rachio-style zone control. Works with any on/off Home Assistant entity
 (`switch.*`, `input_boolean.*`, and compatible irrigation zone entities).
 
-![Rachio Irrigation Card preview](images/card-preview.svg)
+![Rachio Irrigation Card preview](images/rachiov1.png)
 
 This card is designed for Rachio-style irrigation dashboards using the
 entities that are available with the Rachio integration, but it
