@@ -286,6 +286,14 @@ class RachioIrrigationCard extends LitElement {
     return name;
   }
 
+  private get showHeader(): boolean {
+    return this.config.show_header ?? true;
+  }
+
+  private get showConnectionStatus(): boolean {
+    return this.config.show_connection_status ?? true;
+  }
+
   private get showSchedules(): boolean {
     return this.config.show_schedules ?? true;
   }
@@ -455,15 +463,32 @@ class RachioIrrigationCard extends LitElement {
           class=${compact ? "quick-run-card compact" : "quick-run-card"}
           style=${this.renderLayoutVars()}
         >
-          <div class="quick-run-header">
-            <div class="title">${this.config.title}</div>
-            <div class="connection-status">
-              <ha-icon icon="mdi:check-circle"></ha-icon>
-              <span>Connected</span>
-            </div>
-          </div>
-
-          <div class="divider"></div>
+          ${this.showHeader
+            ? html`
+                <div class="quick-run-header">
+                  <div class="header-main">
+                    <div class="title">
+                      ${this.config.header_icon
+                        ? html`<ha-icon icon=${this.config.header_icon}></ha-icon>`
+                        : nothing}
+                      <span>${this.config.title}</span>
+                    </div>
+                    ${this.config.header_subtitle
+                      ? html`<div class="subtitle">${this.config.header_subtitle}</div>`
+                      : nothing}
+                  </div>
+                  ${this.showConnectionStatus
+                    ? html`
+                        <div class="connection-status">
+                          <ha-icon icon="mdi:check-circle"></ha-icon>
+                          <span>Connected</span>
+                        </div>
+                      `
+                    : nothing}
+                </div>
+                <div class="divider"></div>
+              `
+            : nothing}
 
           ${this.renderSchedules()}
 

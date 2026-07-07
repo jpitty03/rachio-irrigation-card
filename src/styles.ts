@@ -27,12 +27,34 @@ export const cardStyles = css`
     align-items: center;
     justify-content: space-between;
     margin-bottom: 12px;
+    gap: 8px;
   }
 
-  .title {
+  .quick-run-header .title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--primary-text-color);
+  }
+
+  .quick-run-header .title ha-icon {
+    --mdc-icon-size: 24px;
+    color: var(--primary-color);
+  }
+
+  .header-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--secondary-text-color);
+    margin-top: 2px;
   }
 
   .connection-status {

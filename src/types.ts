@@ -23,6 +23,10 @@ export interface LayoutConfig {
 export interface RachioIrrigationCardConfig {
   type: string;
   title?: string;
+  header_icon?: string;
+  header_subtitle?: string;
+  show_header?: boolean;
+  show_connection_status?: boolean;
   zones: IrrigationZoneConfig[];
   rain_delay_entity?: string;
   standby_entity?: string;

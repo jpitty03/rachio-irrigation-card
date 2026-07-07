@@ -92,6 +92,7 @@ export class RachioIrrigationCardEditor extends LitElement {
     const layout = this._config.layout ?? {};
     return html`
       <div class="form">
+        <div class="section-title">Header</div>
         <div class="field">
           <ha-textfield
             label="Title"
@@ -99,6 +100,51 @@ export class RachioIrrigationCardEditor extends LitElement {
             @input=${(e: Event) =>
               this._update({ title: (e.target as HTMLInputElement).value })}
           ></ha-textfield>
+        </div>
+        <div class="field">
+          <ha-textfield
+            label="Header icon (mdi:)"
+            .value=${this._config.header_icon ?? ""}
+            placeholder="mdi:sprinkler-variant"
+            @input=${(e: Event) =>
+              this._update({
+                header_icon:
+                  (e.target as HTMLInputElement).value.trim() || undefined,
+              })}
+          ></ha-textfield>
+        </div>
+        <div class="field">
+          <ha-textfield
+            label="Header subtitle"
+            .value=${this._config.header_subtitle ?? ""}
+            placeholder="e.g. Backyard zones"
+            @input=${(e: Event) =>
+              this._update({
+                header_subtitle:
+                  (e.target as HTMLInputElement).value || undefined,
+              })}
+          ></ha-textfield>
+        </div>
+        <div class="field row">
+          <ha-formfield label="Show header">
+            <ha-switch
+              .checked=${this._config.show_header ?? true}
+              @change=${(e: Event) =>
+                this._update({
+                  show_header: (e.target as HTMLInputElement).checked,
+                })}
+            ></ha-switch>
+          </ha-formfield>
+          <ha-formfield label="Show connection status">
+            <ha-switch
+              .checked=${this._config.show_connection_status ?? true}
+              @change=${(e: Event) =>
+                this._update({
+                  show_connection_status:
+                    (e.target as HTMLInputElement).checked,
+                })}
+            ></ha-switch>
+          </ha-formfield>
         </div>
 
         <div class="field row">
