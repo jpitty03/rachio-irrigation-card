@@ -55,6 +55,27 @@ export const cardStyles = css`
     margin-bottom: 12px;
   }
 
+  /* ── Schedules ── */
+  .schedules {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-bottom: 12px;
+  }
+
+  .schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--secondary-text-color);
+  }
+
+  .schedule-item ha-icon {
+    --mdc-icon-size: 14px;
+    color: var(--state-active-color, #4caf50);
+  }
+
   /* ── Status row (rain) ── */
   .status-row {
     display: flex;

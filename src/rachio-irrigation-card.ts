@@ -273,6 +273,19 @@ class RachioIrrigationCard extends LitElement {
       `Zone ${index + 1}`
     );
   }
+  private scheduleLabel(state: { attributes: Record<string, unknown> } | undefined): string {
+    const name = (state?.attributes?.friendly_name as string) || "";
+    if (!name) return "";
+    // Strip the device-name prefix (first hyphenated word, e.g. "blalock-irrigation")
+    const firstSpace = name.indexOf(" ");
+    if (firstSpace === -1) return name;
+    const firstWord = name.substring(0, firstSpace);
+    if (firstWord.includes("-")) {
+      return name.substring(firstSpace + 1);
+    }
+    return name;
+  }
+
   private get showSchedules(): boolean {
     return this.config.show_schedules ?? true;
   }
@@ -298,7 +311,7 @@ class RachioIrrigationCard extends LitElement {
           (s) => html`
             <div class="schedule-item">
               <ha-icon icon="mdi:calendar-clock"></ha-icon>
-              <span>${s.state?.attributes?.friendly_name || s.id}</span>
+              <span>${this.scheduleLabel(s.state) || s.id}</span>
             </div>
           `
         )}
