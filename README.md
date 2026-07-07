@@ -61,6 +61,10 @@ configurable Home Assistant entities such as `switch.*`,
 
 ### HACS Custom Repository Installation
 
+This project is not currently published in the HACS Community Store. Until
+it is accepted there, install it as a HACS custom repository or upload the
+card file manually.
+
 1. In Home Assistant, open HACS.
 2. Click the three-dot menu (top right) → **Custom repositories**.
 3. Add this repository's GitHub URL.
@@ -72,7 +76,7 @@ configurable Home Assistant entities such as `switch.*`,
    - Type: `JavaScript Module`
 7. Refresh your dashboard.
 
-### Manual Installation
+### Manual Upload / Installation
 
 1. Download `rachio-irrigation-card.js` from the latest GitHub release.
 2. Copy it to your HA `/config/www/` directory.
