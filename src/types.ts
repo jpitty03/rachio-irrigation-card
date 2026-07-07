@@ -26,6 +26,8 @@ export interface RachioIrrigationCardConfig {
   zones: IrrigationZoneConfig[];
   rain_delay_entity?: string;
   standby_entity?: string;
+  schedules?: string[];
+  show_schedules?: boolean;
   show_timer?: boolean;
   default_duration?: number;
   stop_action?: ServiceActionConfig;

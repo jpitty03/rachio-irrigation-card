@@ -273,6 +273,39 @@ class RachioIrrigationCard extends LitElement {
       `Zone ${index + 1}`
     );
   }
+  private get showSchedules(): boolean {
+    return this.config.show_schedules ?? true;
+  }
+
+  private renderSchedules() {
+    if (!this.showSchedules) return nothing;
+    if (!this.config.schedules || this.config.schedules.length === 0) return nothing;
+    const enabled = this.config.schedules
+      .map((id) => ({ id, state: this.getEntityState(id) }))
+      .filter((s) => {
+        if (!s.state) return false;
+        // Rachio schedules expose an "enabled" attribute — prefer that
+        // (case-insensitive), fall back to state === "on" for generic switches.
+        const attr = s.state.attributes as Record<string, unknown>;
+        const enabledAttr = attr?.enabled ?? attr?.Enabled;
+        if (enabledAttr !== undefined) return enabledAttr === true;
+        return isEntityOn(s.state.state);
+      });
+    if (enabled.length === 0) return nothing;
+    return html`
+      <div class="schedules">
+        ${enabled.map(
+          (s) => html`
+            <div class="schedule-item">
+              <ha-icon icon="mdi:calendar-clock"></ha-icon>
+              <span>${s.state?.attributes?.friendly_name || s.id}</span>
+            </div>
+          `
+        )}
+      </div>
+    `;
+  }
+
   private renderWarnings(): unknown {
     if (!this.hass) return nothing;
     const missing: string[] = [];
@@ -418,6 +451,8 @@ class RachioIrrigationCard extends LitElement {
           </div>
 
           <div class="divider"></div>
+
+          ${this.renderSchedules()}
 
           ${this.config.rain_delay_entity ? this.renderRainStatus() : nothing}
 

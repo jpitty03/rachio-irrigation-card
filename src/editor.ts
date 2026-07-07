@@ -62,6 +62,24 @@ export class RachioIrrigationCardEditor extends LitElement {
     this._update({ layout });
   }
 
+  private _updateSchedule(index: number, value: string) {
+    if (!this._config) return;
+    const schedules = (this._config.schedules ?? []).slice();
+    if (value) {
+      schedules[index] = value;
+    } else {
+      schedules.splice(index, 1);
+    }
+    this._update({ schedules: schedules.length ? schedules : undefined });
+  }
+
+  private _addSchedule() {
+    if (!this._config) return;
+    const schedules = (this._config.schedules ?? []).slice();
+    schedules.push("");
+    this._update({ schedules });
+  }
+
   private _numValue(value: string): number | undefined {
     const trimmed = value.trim();
     if (trimmed === "") return undefined;
@@ -193,6 +211,44 @@ export class RachioIrrigationCardEditor extends LitElement {
               this._update({ standby_entity: e.detail.value || undefined })}
           ></ha-entity-picker>
         </div>
+
+        <div class="field row">
+          <ha-formfield label="Show schedules">
+            <ha-switch
+              .checked=${this._config.show_schedules ?? true}
+              @change=${(e: Event) =>
+                this._update({
+                  show_schedules: (e.target as HTMLInputElement).checked,
+                })}
+            ></ha-switch>
+          </ha-formfield>
+        </div>
+
+        <div class="section-title">Schedule entities</div>
+        ${(this._config.schedules ?? []).map(
+          (scheduleId, i) => html`
+            <div class="field row">
+              <ha-entity-picker
+                .hass=${this.hass}
+                label="Schedule entity"
+                .value=${scheduleId}
+                allow-custom-entity
+                @value-changed=${(e: CustomEvent) =>
+                  this._updateSchedule(i, e.detail.value)}
+              ></ha-entity-picker>
+              <ha-icon-button
+                class="remove"
+                label="Remove schedule"
+                .path=${"M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"}
+                @click=${() => this._updateSchedule(i, "")}
+              ></ha-icon-button>
+            </div>
+          `
+        )}
+        <ha-button @click=${this._addSchedule}>
+          <ha-icon icon="mdi:plus"></ha-icon>
+          Add schedule
+        </ha-button>
 
         <div class="section-title">Layout</div>
         <div class="field row">

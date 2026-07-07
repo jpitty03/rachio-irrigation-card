@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import { readFileSync, existsSync, writeFileSync, unlinkSync } from "fs";
-import { join, resolve } from "path";
+import { join, resolve, dirname } from "path";
 import { tmpdir } from "os";
 
 function loadEnv() {
@@ -53,6 +53,8 @@ const user = env.HA_USER;
 const pass = env.HA_PASS;
 const remotePath = env.HA_REMOTE_PATH || "/root/homeassistant/www/community/rachio-irrigation-card/rachio-irrigation-card.js";
 const localFile = resolve("dist/rachio-irrigation-card.js");
+const remoteDir = remotePath.substring(0, remotePath.lastIndexOf("/"));
+const remoteFile = remotePath.substring(remotePath.lastIndexOf("/") + 1);
 
 console.log(`\n========================================`);
 console.log(`  Local deploy to ${user}@${host}:${port}`);
@@ -71,11 +73,12 @@ if (!existsSync(localFile)) {
 const winscp = findWinSCP();
 const scriptPath = join(tmpdir(), `winscp-deploy-${Date.now()}.txt`);
 const scriptContent = [
-  `option batch abort`,
-  `option confirm off`,
+  "option batch abort",
+  "option confirm off",
   `open scp://${user}@${host}:${port}/ -hostkey=* -password=${pass}`,
+  `call rm -f ${remoteDir}/${remoteFile}.gz`,
   `put "${localFile}" "${remotePath}"`,
-  `exit`,
+  "exit",
 ].join("\n");
 
 writeFileSync(scriptPath, scriptContent, "utf8");
@@ -89,5 +92,6 @@ try {
 
 console.log(`\n========================================`);
 console.log(`  Deployed to ${remotePath}`);
+console.log(`  (stale .gz removed to prevent caching)`);
 console.log(`  Hard-refresh your browser (Ctrl+Shift+R)`);
 console.log(`========================================`);
