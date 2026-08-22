@@ -16,6 +16,17 @@ export function formatRemaining(seconds: number): string {
   return `${minutes}:${remainder.toString().padStart(2, "0")}`;
 }
 
+export function resolveColumnCount(columns?: unknown): number {
+  const cols = columns ?? 4;
+  if (!Number.isInteger(cols) || (cols as number) < 1 || (cols as number) > 6) {
+    console.warn(
+      `Rachio Irrigation Card: layout.columns ${cols} out of range [1,6]; falling back to 4.`
+    );
+    return 4;
+  }
+  return cols as number;
+}
+
 export async function callConfiguredService(
   hass: HomeAssistantLike,
   action: ServiceActionConfig
