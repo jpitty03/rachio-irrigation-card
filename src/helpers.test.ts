@@ -3,6 +3,7 @@ import {
   getDomain,
   isEntityOn,
   formatRemaining,
+  resolveColumnCount,
   callConfiguredService,
   saveTimerStart,
   clearTimer,
@@ -114,3 +115,40 @@ describe("localStorage timer helpers", () => {
     expect(loadRemainingSeconds(entityId)).toBe(0);
   });
 });
+
+describe("resolveColumnCount", () => {
+  it("defaults to 4 when undefined or null", () => {
+    expect(resolveColumnCount(undefined)).toBe(4);
+    expect(resolveColumnCount(null)).toBe(4);
+  });
+
+  it("accepts valid integers in range [1, 6]", () => {
+    expect(resolveColumnCount(1)).toBe(1);
+    expect(resolveColumnCount(2)).toBe(2);
+    expect(resolveColumnCount(3)).toBe(3);
+    expect(resolveColumnCount(4)).toBe(4);
+    expect(resolveColumnCount(5)).toBe(5);
+    expect(resolveColumnCount(6)).toBe(6);
+  });
+
+  it("falls back to 4 for out of range integers", () => {
+    expect(resolveColumnCount(0)).toBe(4);
+    expect(resolveColumnCount(-1)).toBe(4);
+    expect(resolveColumnCount(7)).toBe(4);
+  });
+
+  it("falls back to 4 for non-integers", () => {
+    expect(resolveColumnCount(2.5)).toBe(4);
+    expect(resolveColumnCount(NaN)).toBe(4);
+    expect(resolveColumnCount(Infinity)).toBe(4);
+  });
+
+  it("falls back to 4 for non-numeric types", () => {
+    expect(resolveColumnCount("four" as unknown as number)).toBe(4);
+    expect(resolveColumnCount("4" as unknown as number)).toBe(4);
+    expect(resolveColumnCount(true as unknown as number)).toBe(4);
+    expect(resolveColumnCount({} as unknown as number)).toBe(4);
+    expect(resolveColumnCount([] as unknown as number)).toBe(4);
+  });
+});
+

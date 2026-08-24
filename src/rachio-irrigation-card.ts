@@ -5,7 +5,16 @@ import type {
   RachioIrrigationCardConfig,
   ServiceActionConfig,
 } from "./types";
-import { formatRemaining, getDomain, isEntityOn, callConfiguredService, saveTimerStart, clearTimer, loadRemainingSeconds } from "./helpers";
+import {
+  formatRemaining,
+  getDomain,
+  isEntityOn,
+  callConfiguredService,
+  saveTimerStart,
+  clearTimer,
+  loadRemainingSeconds,
+  resolveColumnCount,
+} from "./helpers";
 import { cardStyles } from "./styles";
 
 const SERVICE_RE = /^[a-z_]+\.[a-z_0-9]+$/i;
@@ -229,14 +238,7 @@ class RachioIrrigationCard extends LitElement {
   }
 
   private get columnCount(): number {
-    const cols = this.config.layout?.columns ?? 4;
-    if (cols < 1 || cols > 6) {
-      console.warn(
-        `Rachio Irrigation Card: layout.columns ${cols} out of range [1,6]; falling back to 4.`
-      );
-      return 4;
-    }
-    return cols;
+    return resolveColumnCount(this.config.layout?.columns);
   }
 
   private get actionColumnCount(): number {
