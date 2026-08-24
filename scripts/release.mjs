@@ -53,6 +53,14 @@ if (!["patch", "minor", "major"].includes(bumpType)) {
   process.exit(1);
 }
 
+// ── Ensure on main branch and up to date ──
+const currentBranch = runQuiet("git branch --show-current");
+if (currentBranch !== "main") {
+  console.error(`\nERROR: Releases must be run from the 'main' branch (currently on '${currentBranch}').`);
+  process.exit(1);
+}
+run("git pull origin main", "Pull latest main");
+
 // ── Read + bump version ──
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const oldVersion = pkg.version;
